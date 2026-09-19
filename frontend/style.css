@@ -1,0 +1,163 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #060607;
+  --fg: #f3f3f3;
+  --dim: #7d7d80;
+  --line: rgba(255, 255, 255, 0.14);
+  --glow: rgba(255, 255, 255, 0.65);
+  --glass: rgba(255, 255, 255, 0.045);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Pretendard", "Segoe UI", -apple-system, "Malgun Gothic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.hidden { opacity: 0 !important; pointer-events: none !important; transform: translate(-50%, calc(-50% + 10px)); }
+
+/* Single input */
+#startCard {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 10; display: flex; align-items: center; gap: 8px;
+  padding: 8px 8px 8px 22px; transition: opacity .5s ease, transform .5s ease;
+}
+#questionInput {
+  background: transparent; border: none; outline: none; color: var(--fg);
+  font-size: 16px; width: 380px; font-family: inherit;
+}
+#questionInput::placeholder { color: var(--dim); }
+#startBtn {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--line); background: rgba(255, 255, 255, 0.06);
+  color: var(--fg); font-size: 14px; cursor: pointer; transition: background .2s ease;
+}
+#startBtn:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* Candidate race — small, corner, non-intrusive */
+#candSvg {
+  position: fixed; top: 30px; right: 30px; z-index: 6;
+  transition: opacity .4s ease;
+}
+.candTok { font: 12px "Consolas", monospace; fill: var(--dim); }
+.candTok.win { fill: var(--fg); }
+.candBarBg { fill: rgba(255, 255, 255, 0.06); }
+.candBarFill { fill: rgba(255, 255, 255, 0.4); transition: width .45s cubic-bezier(.2,.8,.2,1); }
+.candBarFill.win { fill: var(--fg); }
+
+/* Progress dots */
+#dots {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 6; transition: opacity .4s ease;
+}
+.dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); transition: all .3s ease; }
+.dot.done { background: rgba(255, 255, 255, 0.55); }
+.dot.active { background: #fff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.9); transform: scale(1.4); }
+
+/* Result */
+#resultToast {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 12; padding: 30px 38px; max-width: 620px; text-align: center;
+  display: flex; flex-direction: column; gap: 18px; align-items: center;
+  transition: opacity .6s ease, transform .6s ease;
+}
+#resultText { font-size: 19px; line-height: 1.7; }
+#replayBtn {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06); color: var(--fg); cursor: pointer; font-size: 15px;
+}
+#replayBtn:hover { background: rgba(255, 255, 255, 0.18); }
+
+@media (max-width: 640px) {
+  #questionInput { width: 60vw; }
+}
+
+/* Transformer trace — a continuous side-view current, fed by real captured data. */
+.txBody { background:#000; font-family:Consolas,"Courier New",monospace; overflow:hidden; }
+.txCode { position:fixed; inset:0 auto 0 0; width:31vw; padding:62px 3vw; color:rgba(255,255,255,.6); border-right:1px solid rgba(255,255,255,.06); z-index:1; }.txCode pre { margin:24px 0; font:clamp(10px,1vw,14px)/1.62 Consolas,monospace; white-space:pre-wrap; }.txCode .muted { color:rgba(255,255,255,.3); }.txFile,.txCodeFoot { color:rgba(255,255,255,.28); font-size:10px; letter-spacing:.13em; }.txCodeFoot { position:absolute; bottom:36px; }
+.txStage { position:fixed; left:31vw; right:0; top:0; bottom:0; padding:26px 2vw 22px; }
+/* 모델명/상태 헤더는 처음으로 버튼과 겹쳐 보이고 잡음만 늘려서 숨긴다 — 그 자리는
+   왼쪽 위 stageInfo(제목/설명)와 오른쪽 위 질문·재시작 버튼으로 대신한다. */
+.txHeader { display:none; }
+/* 지금 단계의 제목/설명 — SVG 세계 좌표에 두면 카메라가 줌아웃될 때 같이 작아지고
+   패닝을 따라 화면 밖으로 나가버린다. 그래서 일반 HTML로 화면 왼쪽 위에 고정해
+   크기도 위치도 항상 그대로인 플로팅 위젯으로 둔다. */
+.txStageInfo { position:fixed; top:26px; left:28px; z-index:7; max-width:44vw; pointer-events:none; font-family:Consolas,"Courier New",monospace; opacity:0; transition:opacity .5s ease; }
+.txStageInfo.show { opacity:1; }
+#stageTitle { font-size:20px; letter-spacing:.04em; color:rgba(255,255,255,.7); }
+#stageSub { margin-top:6px; font-size:18px; letter-spacing:.03em; color:rgba(255,255,255,.6); }
+.txSource { position:fixed; top:70px; right:28px; z-index:7; max-width:44vw; text-align:right; overflow:hidden; white-space:nowrap; color:rgba(255,255,255,.85); font-size:16px; opacity:0; transition:opacity .5s ease; }.txSource.show { opacity:1; }.txSource span { display:inline-block; margin-left:9px; opacity:0; animation:txAppear .35s forwards; }.txSource span::after { content:attr(title); display:block; margin-top:5px; color:rgba(255,255,255,.3); font-size:9px; text-align:center; } @keyframes txAppear { to { opacity:1; } }
+#traceSvg { width:100%; height:calc(100vh - 166px); overflow:visible; }.txWire { stroke:rgba(255,255,255,.18); stroke-width:1.4; }.txGuide { stroke:rgba(255,255,255,.4); stroke-width:2.5; }.txActiveWire { stroke:#fff; stroke-width:1.8; filter:url(#txGlow); }.txDimDot { fill:rgba(255,255,255,.4); }.txId { fill:rgba(255,255,255,.45); font:13px Consolas,monospace; text-anchor:middle; }.txToken { fill:#fff; font:15px Consolas,monospace; text-anchor:middle; }.txCandidateText { fill:rgba(255,255,255,.74); font:12px Consolas,monospace; text-anchor:end; }.txProb { fill:rgba(255,255,255,.46); font:11px Consolas,monospace; }.txBarBg { fill:rgba(255,255,255,.09); }.txBar { fill:#fff; filter:url(#txGlow); transition:width .45s cubic-bezier(.16,1,.3,1); }
+.txAnswer { height:25px; color:rgba(255,255,255,.42); font-size:13px; letter-spacing:.03em; }.txAnswer b { color:#fff; font-weight:400; text-shadow:0 0 10px rgba(255,255,255,.9); }/* 시작 화면은 박스/배경 없이 입력창과 RUN 버튼만 떠 있게 둔다. RUN을 누르면
+   폼은 그 즉시(트랜지션 없이) 사라지고, 입력창과 완전히 같은 폰트·크기·위치인
+   디코이 문장(txDecoy)이 그 자리를 이어받는다. */
+/* input을 폼 전체의 flex 중앙정렬로 맞추면, 버튼이 같은 줄에 있든(가로로 밀림)
+   아래 줄에 있든(세로로 밀림) input 자신의 중심이 화면 진짜 중앙(디코이/1단계
+   문장이 있는 자리)에서 항상 조금씩 벗어난다. 그래서 input만 따로 화면
+   50%/50%에 고정하고, 버튼·힌트는 거기서부터 고정된 간격만큼 아래에 각자
+   따로 고정한다 — 서로의 위치에 영향을 주지 않는다. */
+.txForm { position:static; }.txForm label { display:none; }.txForm div { display:contents; }.txForm input { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; width:min(510px,calc(100vw - 42px)); color:#fff; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.4); outline:0; padding:8px 0; font:15px Consolas,monospace; text-align:center; }.txForm button { position:fixed; left:50%; top:calc(50% + 32px); transform:translateX(-50%); z-index:4; color:#fff; border:1px solid rgba(255,255,255,.3); background:transparent; padding:6px 20px; cursor:pointer; font:10px Consolas,monospace; }.txForm p { position:fixed; left:50%; top:calc(50% + 70px); transform:translateX(-50%); z-index:4; width:min(510px,calc(100vw - 42px)); text-align:center; color:rgba(255,255,255,.35); font-size:10px; line-height:1.45; }.txForm p:empty { display:none; }
+/* 입력창 밑에 뜨는 추천 질문 박스 — 클릭하면 그 문장으로 바로 실행된다. */
+.txSuggest { position:fixed; left:50%; top:calc(50% + 110px); transform:translateX(-50%); z-index:4; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width:min(600px,calc(100vw - 42px)); }
+.txSuggest button { padding:8px 14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.22); color:rgba(255,255,255,.65); font:11px Consolas,monospace; letter-spacing:.02em; cursor:pointer; border-radius:4px; transition:background .2s ease,color .2s ease,border-color .2s ease; }
+.txSuggest button:hover { background:rgba(255,255,255,.1); color:#fff; border-color:rgba(255,255,255,.45); }
+/* 입력창 텍스트와 완전히 같은 폰트/크기 — RUN을 누른 순간 입력창 대신 바로
+   이 자리에 나타나므로, 한 픽셀도 달라 보이면 안 된다. */
+.txDecoy { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; color:#fff; font:15px Consolas,monospace; display:none; }
+.txDecoy.show { display:block; }
+@media(max-width:800px){.txCode{display:none}.txStage{left:0;padding:22px}.txSource{font-size:12px}.txForm{top:auto;bottom:25px;transform:translateX(-50%)}#traceSvg{height:calc(100vh - 145px)}.txId{font-size:10px}.txToken{font-size:11px}}
+
+/* 예전엔 여기서 스테이지 전체를 opacity:0으로 숨겨뒀다가 .running에서 따로
+   .55s 페이드인을 시켰다 — introZone이 문장 하나하나를 직접 제어하는 지금은
+   이 이중 페이드가 오히려 문장을 한동안 안 보이게 가려버린다. 그래서 뺐다:
+   .running은 이제 pointer-events만 켜고, 화면은 항상 그대로 보인다. */
+.txStage { left:0; }.txStage.running { pointer-events:auto; }
+.txEmbedDot { fill:rgba(255,255,255,.55); }.txEmbedWord { fill:rgba(255,255,255,.6); font:13px "Galmuri11","Malgun Gothic","Apple SD Gothic Neo",sans-serif; text-anchor:middle; }
+/* 내가 입력한 문장의 단어들 — 고정 기준 단어(연한 흰색)와 구분되는 빨간 점 + 검은
+   테두리를 두른 흰 글자, 글자 크기도 고정 단어(12px)의 2배로 눈에 띄게 키운다. */
+.txEmbedDotMine { fill:#ff0000; }.txEmbedWordMine { fill:#fff; stroke:#000; stroke-width:3px; paint-order:stroke; font:24px "Galmuri11","Malgun Gothic","Apple SD Gothic Neo",sans-serif; font-weight:400; text-anchor:middle; }
+/* 점이 숫자(질문과의 유사도)로 바뀌어 소용돌이치며 빨려들어갈 때 쓰는 글자. */
+.txEmbedNum { fill:rgba(255,255,255,.6); font:11px Consolas,monospace; text-anchor:middle; }
+.txEmbedNumMine { fill:#ff3b3b; font:15px Consolas,monospace; font-weight:600; text-anchor:middle; }
+.txEmbedGrid { stroke:rgba(255,255,255,.08); stroke-width:1.5; }
+/* 레이어 스택 장면의 막대 — 흰색은 셀프어텐션, 주황색은 FFN. 둘 다 실제로 그
+   레이어의 서브모듈 출력 크기를 잰 값이며, 빛이 도착하는 순간 바닥에서
+   솟아오른다. */
+.txLayerAttnBar { fill:#fff; }
+.txLayerFfnBar { fill:#ffb020; }
+.txRail { fill:rgba(255,255,255,.72); font:34px Consolas,monospace; letter-spacing:.2em; }.txBigToken { fill:#fff; font:25px Consolas,monospace; text-anchor:middle; }.txBigId { fill:rgba(255,255,255,.65); font:16px Consolas,monospace; text-anchor:middle; }
+.txMainRail { stroke:rgba(255,255,255,.42); stroke-width:2.5; }
+.txBracket { fill:#fff; font:25px Consolas,monospace; filter:url(#txGlow); }.txArrayMid { fill:rgba(255,255,255,.7); font:25px Consolas,monospace; }
+.txCursor { fill:#fff; }.txCursorChar { fill:#000; }.txDivider { stroke:rgba(255,255,255,.35); stroke-width:1.5; }
+.txArrayLight { fill:#fff; filter:url(#txGlow); }
+.txLamp { fill:rgba(255,255,255,.18); }.txLamp.on { fill:#fff; filter:url(#txGlow); }.txCandBox { fill:#030304; stroke:rgba(255,255,255,.4); stroke-width:2; }
+.txBar.win { fill:#fff; filter:url(#txGlow); }.txCandidateText.win { fill:#fff; }
+.txBar.done { fill:rgba(255,255,255,.5); }.txLamp.done { fill:rgba(255,255,255,.5); }
+.txHero { fill:#fff; filter:url(#txGlow); animation:txHeroPulse 1.4s ease-in-out infinite; transition:opacity .22s ease; } @keyframes txHeroPulse { 0%,100% { r:7; opacity:1; } 50% { r:8.5; opacity:.75; } }
+.txHero.hidden { opacity:0 !important; animation:none; }
+
+.txReset { position:fixed; top:26px; right:28px; z-index:8; padding:6px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.22); color:rgba(255,255,255,.65); font:11px Consolas,monospace; letter-spacing:.08em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .3s ease, background .2s ease, color .2s ease; }
+.txReset.show { opacity:1; pointer-events:auto; }
+.txReset:hover { background:rgba(255,255,255,.16); color:#fff; }
+
+.modeLink {
+  position: fixed; top: 26px; right: 28px; z-index: 6;
+  font-size: 12px; letter-spacing: 0.04em; color: var(--dim);
+  text-decoration: none; border-bottom: 1px solid transparent; transition: color .2s ease, border-color .2s ease;
+}
+.modeLink:hover { color: var(--fg); border-color: var(--line); }

@@ -1,0 +1,29 @@
+127.0.0.1 - - [16/Sep/2026 21:27:31] "GET /index.html HTTP/1.1" 200 -
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+server started
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:03<15:51,  3.29s/it]Loading weights:  76%|#######5  | 219/290 [00:03<00:00, 90.07it/s]Loading weights: 100%|##########| 290/290 [00:04<00:00, 71.10it/s]
+127.0.0.1 - - [16/Sep/2026 21:28:06] "POST /api/generate HTTP/1.1" 200 -
+saved 10 steps -> C:\Users\HP\AppData\Local\Temp\tmpjb44ozt9.json
+answer: Hello! How can I assist you today?
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:02<13:14,  2.75s/it]Loading weights:  84%|########3 | 243/290 [00:02<00:00, 118.18it/s]Loading weights: 100%|##########| 290/290 [00:03<00:00, 83.68it/s] 
+127.0.0.1 - - [16/Sep/2026 21:28:24] "POST /api/generate HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 21:28:36] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 21:28:36] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 21:28:36] "GET /script.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 21:28:36] code 404, message File not found
+127.0.0.1 - - [16/Sep/2026 21:28:36] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [16/Sep/2026 21:44:31] "GET /index.html HTTP/1.1" 304 -
+127.0.0.1 - - [16/Sep/2026 21:44:31] "GET /style.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Sep/2026 21:44:31] "GET /script.js HTTP/1.1" 304 -
+saved 10 steps -> C:\Users\HP\AppData\Local\Temp\tmphy5f2yyf.json
+answer: Hello! How can I assist you today?
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:02<10:34,  2.20s/it]Loading weights:  60%|#####9    | 173/290 [00:02<00:01, 103.04it/s]Loading weights:  85%|########4 | 246/290 [00:02<00:00, 127.82it/s]Loading weights: 100%|##########| 290/290 [00:03<00:00, 96.16it/s] 
+127.0.0.1 - - [16/Sep/2026 21:44:45] "POST /api/generate HTTP/1.1" 200 -
+saved 10 steps -> C:\Users\HP\AppData\Local\Temp\tmp3hm2b5x8.json
+answer: Hello! How can I assist you today?
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:01<08:25,  1.75s/it]Loading weights:  96%|#########6| 279/290 [00:01<00:00, 204.98it/s]Loading weights: 100%|##########| 290/290 [00:01<00:00, 153.75it/s]
+127.0.0.1 - - [16/Sep/2026 21:45:28] "POST /api/generate HTTP/1.1" 200 -
+saved 21 steps -> C:\Users\HP\AppData\Local\Temp\tmpkawtm8fn.json
+answer: I am Qwen, a large language model created by Alibaba Cloud. My name is Qwen.
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:02<14:21,  2.98s/it]Loading weights:  84%|########3 | 243/290 [00:03<00:00, 110.94it/s]Loading weights: 100%|##########| 290/290 [00:03<00:00, 86.96it/s] 
+127.0.0.1 - - [16/Sep/2026 21:51:59] "POST /api/generate HTTP/1.1" 200 -

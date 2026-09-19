@@ -1,0 +1,156 @@
+::1 - - [16/Sep/2026 16:51:47] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:47] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:47] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:54] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:55] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:55] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:51:55] code 404, message File not found
+::1 - - [16/Sep/2026 16:51:55] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [16/Sep/2026 16:59:56] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:59:56] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:59:56] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:59:57] "GET /lib/three.module.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:59:57] "HEAD /lib/three.module.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 16:59:57] "HEAD /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:00:02] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:00:02] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:00:02] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:00:02] "GET /lib/three.module.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:00:11] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:07:24] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:28] "GET /index.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:07:28] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:07:28] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:28] "GET /lib/three.module.js HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:07:53] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:53] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:53] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:53] "GET /lib/three.module.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:07:53] code 404, message File not found
+::1 - - [16/Sep/2026 17:07:53] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [16/Sep/2026 17:07:56] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:09:33] "GET /index.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:09:33] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:09:33] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:09:33] "GET /lib/three.module.js HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:38:59] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:43:32] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:32] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:32] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:38] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:38] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:38] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:43:38] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:04] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:04] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:05] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:09] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:50:09] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:50:09] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:09] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:50:12] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:55:23] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:55:23] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:55:28] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:55:28] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 17:55:28] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:55:28] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 17:56:39] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:01:14] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:01:14] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:01:18] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:01:18] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:01:18] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:01:18] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:01:37] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:10:07] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:07] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:07] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:07] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:12] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:12] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:10:12] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:10:12] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:11:10] "GET /data/sample_response.json HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:11:49] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:11:49] "GET /lstm.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:11:49] "GET /lstm.js HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:11:52] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:16:09] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:16:15] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:16:15] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:16:15] "GET /lstm.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:16:15] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:16:38] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:22:31] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:22:31] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:22:37] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:22:37] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:22:37] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:22:37] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:23:23] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:28:48] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:28:49] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:28:53] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:28:53] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:28:53] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:28:53] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:28:56] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:48:51] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:48:52] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:48:52] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:48:52] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 18:48:55] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:49:08] "GET /data/sample_response.json HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 18:49:09] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:04:44] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 19:04:44] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 19:04:44] "GET /lstm.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 19:04:44] "GET /lstm.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 19:05:12] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:05:12] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:06:17] "GET /lstm.html HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:06:17] "GET /style.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:06:17] "GET /lstm.css HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 19:06:17] "GET /lstm.js HTTP/1.1" 304 -
+::1 - - [16/Sep/2026 21:21:39] "GET /lstm.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 21:21:39] "GET /index.html HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 21:21:39] "GET /style.css HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 21:21:39] "GET /script.js HTTP/1.1" 200 -
+::1 - - [16/Sep/2026 21:21:47] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:21:47] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:21:48] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:21:48] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:22:12] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:22:12] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:22:13] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:22:13] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:22:13] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:22:13] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:22:13] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:22:13] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:22:13] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:22:13] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:19] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:19] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:22] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:22] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:22] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:22] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:23] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:23] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:24] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:24] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:24:24] code 501, message Unsupported method ('POST')
+::1 - - [16/Sep/2026 21:24:24] "POST /api/generate HTTP/1.1" 501 -
+::1 - - [16/Sep/2026 21:26:36] "GET /index.html HTTP/1.1" 200 -

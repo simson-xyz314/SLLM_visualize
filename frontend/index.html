@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Token Current</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" /><link rel="stylesheet" href="style.css" /></head>
+<body class="txBody">
+  <button id="resetBtn" class="txReset" title="처음으로 돌아가기">⟲ 처음으로</button>
+  <div id="stageInfo" class="txStageInfo"><div id="stageTitle"></div><div id="stageSub"></div></div>
+  <main id="traceStage" class="txStage"><header class="txHeader"><div id="traceName">TOKEN CURRENT</div><div id="metric">INITIALIZING</div></header><div id="source" class="txSource"></div><svg id="traceSvg" viewBox="0 0 1500 760" preserveAspectRatio="xMidYMid meet" aria-label="Transformer inference trace"></svg><div id="answer" class="txAnswer"></div></main>
+  <form id="traceForm" class="txForm"><label for="traceInput">ASK THE MODEL</label><div><input id="traceInput" autocomplete="off" autofocus placeholder="무엇이든 입력하세요" /><button>RUN</button></div><p id="formHint"></p></form>
+  <div id="suggestions" class="txSuggest"><button type="button">서울은 어느 나라의 수도야?</button><button type="button">3+5는 뭐야?</button><button type="button">넌 누구야?</button><button type="button">AI가 뭐야?</button></div>
+  <div id="decoyText" class="txDecoy"></div>
+  <script type="module" src="script.js"></script>
+</body></html>
