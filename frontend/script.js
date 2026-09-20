@@ -837,7 +837,11 @@ async function forkFillMerge(g,token,{from,items,baseline,mergeTo}){
       const q=Math.min(1,(now-start)/dur),e=1-Math.pow(1-q,3);
       o.setAttribute('cx',x0+(x1-x0)*e);
       o.setAttribute('cy',y0+(y1-y0)*e);
-      if(!landed&&q>=1){landed=true;growBarUp(it.bar,it.h,baseline)}
+      if(!landed&&q>=1){
+        landed=true;
+        growBarUp(it.bar,it.h,baseline);
+        if(it.valLabel){it.valLabel.style.transition='opacity .3s';it.valLabel.style.opacity=1}
+      }
       if(q<1)requestAnimationFrame(step);else done();
     }
     requestAnimationFrame(step);
@@ -869,87 +873,132 @@ async function transformerZone(g,startX,data,token){
   if(!layers.length)return X;
 
   const barW=30,barGap=10,zoneW=numLayers*(barW+barGap)-barGap;
-  const pad=100,mergeGap=160,boxH=320,maxBarH=220;
+  const boxPad=70,boxGap=240,boxH=320,maxBarH=220;
   const boxCenterY=railY,entryX=X;
-  const attnLeft=entryX+pad,attnRight=attnLeft+zoneW;
-  const mergeX=attnRight+mergeGap/2;
-  const ffnLeft=mergeX+mergeGap/2,ffnRight=ffnLeft+zoneW;
-  const boxLeft=entryX,boxRight=ffnRight+pad;
+  const attnBoxLeft=entryX;
+  const attnLeft=attnBoxLeft+boxPad,attnRight=attnLeft+zoneW;
+  const attnBoxRight=attnRight+boxPad;
+  const ffnBoxLeft=attnBoxRight+boxGap;
+  const ffnLeft=ffnBoxLeft+boxPad,ffnRight=ffnLeft+zoneW;
+  const ffnBoxRight=ffnRight+boxPad;
   const boxTop=boxCenterY-boxH/2,boxBottom=boxCenterY+boxH/2,baseline=boxBottom-30;
 
-  // 레일을 그대로 감싸는 큰 박스 하나 + 캡션 + 구역 라벨을 미리 그려둔다.
-  const box=n('rect',{x:boxLeft,y:boxTop,width:boxRight-boxLeft,height:boxH,rx:18,class:'txCandBox'});
-  const boxLabel=t(boxLeft+24,boxTop-14,`TRANSFORMER LAYERS ×${numLayers}`,'txId');
+  // 흰색(어텐션)과 주황색(FFN)을 한 박스에 같이 두지 않고, 서로 다른 두 박스로
+  // 나눈다 — 그래야 카메라가 각 박스에 맞춰 따로 더 가까이 줌인할 수 있다.
+  // 두 박스는 레일 높이의 연결선으로 미리 이어져 있다.
+  const attnBox=n('rect',{x:attnBoxLeft,y:boxTop,width:attnBoxRight-attnBoxLeft,height:boxH,rx:18,class:'txCandBox'});
+  const ffnBox=n('rect',{x:ffnBoxLeft,y:boxTop,width:ffnBoxRight-ffnBoxLeft,height:boxH,rx:18,class:'txCandBox'});
+  g.append(line(attnBoxRight,boxCenterY,ffnBoxLeft,boxCenterY,'txGuide'));
+  const boxLabel=t(attnBoxLeft+24,boxTop-14,`TRANSFORMER LAYERS ×${numLayers}`,'txId');
   boxLabel.style.textAnchor='start';
   const attnLabel=t((attnLeft+attnRight)/2,boxTop+26,'SELF-ATTENTION','txProb');
   attnLabel.style.textAnchor='middle';
+  const attnDesc=t((attnLeft+attnRight)/2,boxTop+44,'레이어별 셀프어텐션 출력 크기(실측값)','txProb');
+  attnDesc.style.textAnchor='middle';
   const ffnLabel=t((ffnLeft+ffnRight)/2,boxTop+26,'FFN','txProb');
   ffnLabel.style.textAnchor='middle';
-  const introEls=[box,boxLabel,attnLabel,ffnLabel];
+  const ffnDesc=t((ffnLeft+ffnRight)/2,boxTop+44,'레이어별 FFN(피드포워드) 출력 크기(실측값)','txProb');
+  ffnDesc.style.textAnchor='middle';
+  const introEls=[attnBox,ffnBox,boxLabel,attnLabel,attnDesc,ffnLabel,ffnDesc];
   introEls.forEach(el=>el.style.opacity=0);
   g.append(...introEls);
   requestAnimationFrame(()=>introEls.forEach(el=>{el.style.transition='opacity .8s';el.style.opacity=1}));
 
+  // 박스 하나의 폭에 맞춰(전체 스팬이 아니라) 타이트하게 줌인하는 헬퍼 — 박스가
+  // 둘로 나뉜 덕분에 각자 훨씬 자세히 볼 수 있다.
+  function zoomToBox(bLeft,bRight){
+    const stackW=(bRight-bLeft)+80,stackH=boxH+80;
+    const zoomW=Math.max(VB_W0,stackW*1.02,stackH*1.02*(VB_W0/VB_H0));
+    const zoomH=zoomW*(VB_H0/VB_W0);
+    targetVBW=zoomW;
+    targetVBH=zoomH;
+    targetX=bLeft+(bRight-bLeft)/2-zoomW*0.5;
+    targetY=boxCenterY-zoomH*0.5;
+  }
+
   // 어텐션 막대(흰색)와 FFN 막대(주황색) — 둘 다 실제로 그 레이어의 셀프어텐션/
   // FFN 서브모듈 출력 크기를 잰 값이다(장식 아님). 처음엔 높이 0, 빛이 도착하면
   // 바닥에서 솟아오른다.
+  // 막대마다 그 레이어의 실제 정규화 값(0~1)을 작은 숫자 태그로 위에 달아둔다 —
+  // 막대가 다 자란 위치(최종 높이는 이미 알고 있으므로) 바로 위에 미리 놓고,
+  // 막대가 켜지는 순간 같이 페이드인만 시킨다.
   const attnBars=layers.map((ly,i)=>{
-    const x=attnLeft+i*(barW+barGap)+barW/2;
+    const x=attnLeft+i*(barW+barGap)+barW/2,h=Math.max(6,(ly.attn_norm||0)*maxBarH);
     const bar=n('rect',{x:x-barW/2,y:baseline,width:barW,height:0,rx:2,class:'txLayerAttnBar'});
-    g.append(bar);
-    return{x,bar,h:Math.max(6,(ly.attn_norm||0)*maxBarH)};
+    const valLabel=t(x,baseline-h-6,(ly.attn_norm||0).toFixed(2),'txLayerBarValue');
+    valLabel.style.textAnchor='middle';
+    valLabel.style.opacity=0;
+    g.append(bar,valLabel);
+    return{x,bar,h,valLabel};
   });
   const ffnBars=layers.map((ly,i)=>{
-    const x=ffnLeft+i*(barW+barGap)+barW/2;
+    const x=ffnLeft+i*(barW+barGap)+barW/2,h=Math.max(6,(ly.ffn_norm||0)*maxBarH);
     const bar=n('rect',{x:x-barW/2,y:baseline,width:barW,height:0,rx:2,class:'txLayerFfnBar'});
-    g.append(bar);
-    return{x,bar,h:Math.max(6,(ly.ffn_norm||0)*maxBarH)};
+    const valLabel=t(x,baseline-h-6,(ly.ffn_norm||0).toFixed(2),'txLayerBarValue');
+    valLabel.style.textAnchor='middle';
+    valLabel.style.opacity=0;
+    g.append(bar,valLabel);
+    return{x,bar,h,valLabel};
   });
 
-  // 레일을 타고 박스 입구까지 이동한 뒤, 박스 전체가 보이도록 카메라를 줌아웃한다.
+  // 레일을 타고 어텐션 박스 입구까지 이동한 뒤, 그 박스 하나에만 맞춰
+  // 타이트하게 줌인한다.
   await centerOn(entryX,token);
-  if(token!==runId)return boxRight+250;
+  if(token!==runId)return ffnBoxRight+250;
   heroOverride=true;
-  const stackW=(boxRight-boxLeft)+120,stackH=boxH+120;
-  const zoomW=Math.max(VB_W0,stackW*1.05,stackH*1.05*(VB_W0/VB_H0));
-  const zoomH=zoomW*(VB_H0/VB_W0);
-  targetVBW=zoomW;
-  targetVBH=zoomH;
-  targetX=boxLeft+(boxRight-boxLeft)/2-zoomW*0.5;
-  targetY=boxCenterY-zoomH*0.5;
+  zoomToBox(attnBoxLeft,attnBoxRight);
   await wait(500);
-  if(token!==runId)return boxRight+250;
+  if(token!==runId)return ffnBoxRight+250;
 
-  // ① 진입: 굵은 빛 한 줄기가 들어와 어텐션 구역 입구에서 사라진다.
+  // ① 진입: 굵은 빛 한 줄기가 들어와 어텐션 박스 입구에서 사라진다.
   heroEl.classList.add('hidden');
   await wait(200);
-  if(token!==runId)return boxRight+250;
+  if(token!==runId)return ffnBoxRight+250;
 
   // ② 어텐션 구간: 레이어 수만큼 가는 빛 가닥으로 갈라져 각자 자기 막대로
   // 흩어져 도착하는 순간 바닥에서 막대가 솟아오른다.
-  let merged=await forkFillMerge(g,token,{from:{x:attnLeft-40,y:boxCenterY},items:attnBars,baseline,mergeTo:{x:mergeX,y:boxCenterY}});
-  if(token!==runId){if(merged)merged.remove();return boxRight+250}
+  let merged=await forkFillMerge(g,token,{from:{x:attnLeft-40,y:boxCenterY},items:attnBars,baseline,mergeTo:{x:attnBoxRight+40,y:boxCenterY}});
+  if(token!==runId){if(merged)merged.remove();return ffnBoxRight+250}
 
-  // ③ 중간 합류: 잠깐 하나로 모인 채 머문다.
-  await wait(250);
-  if(token!==runId){if(merged)merged.remove();return boxRight+250}
+  // ③ 중간 합류: 잠깐 하나로 모인 채 머문다 — 그동안 카메라는 FFN 박스에
+  // 맞춰 다시 타이트하게 줌인/이동하고, 합쳐진 빛도 연결선을 타고 FFN 박스
+  // 입구까지 실제로 이동한다.
+  await wait(200);
+  if(token!==runId){if(merged)merged.remove();return ffnBoxRight+250}
+  zoomToBox(ffnBoxLeft,ffnBoxRight);
+  if(merged){
+    await new Promise(done=>{
+      const x0=+merged.getAttribute('cx'),x1=ffnLeft-40,start=performance.now();
+      const dur=Math.max(400,Math.abs(x1-x0)/0.5);
+      function step(now){
+        if(token!==runId){done();return}
+        const q=Math.min(1,(now-start)/dur),e=1-Math.pow(1-q,3);
+        merged.setAttribute('cx',x0+(x1-x0)*e);
+        if(q<1)requestAnimationFrame(step);else done();
+      }
+      requestAnimationFrame(step);
+    });
+  }else{
+    await wait(400);
+  }
+  if(token!==runId){if(merged)merged.remove();return ffnBoxRight+250}
 
-  // ④ FFN 구간: 합쳐졌던 그 자리에서 다시 갈라져 주황색 막대들을 채운다 —
+  // ④ FFN 구간: 도착한 그 자리에서 다시 갈라져 주황색 막대들을 채운다 —
   // merged를 그 자리에서 지우고 같은 프레임에 새로 포크하므로 틈이 없다.
   if(merged)merged.remove();
-  merged=await forkFillMerge(g,token,{from:{x:mergeX,y:boxCenterY},items:ffnBars,baseline,mergeTo:{x:ffnRight+40,y:boxCenterY}});
-  if(token!==runId){if(merged)merged.remove();return boxRight+250}
+  merged=await forkFillMerge(g,token,{from:{x:ffnLeft-40,y:boxCenterY},items:ffnBars,baseline,mergeTo:{x:ffnBoxRight+40,y:boxCenterY}});
+  if(token!==runId){if(merged)merged.remove();return ffnBoxRight+250}
 
   // ⑤ 탈출: 다시 하나의 깔끔한 빛으로 합쳐져 다음 단계로 직진한다 — 같은
   // 프레임에 hero가 이어받는다.
   if(merged)merged.remove();
-  heroWorldX=ffnRight+40;
-  heroEl.setAttribute('cx',ffnRight+40);
+  heroWorldX=ffnBoxRight+40;
+  heroEl.setAttribute('cx',ffnBoxRight+40);
   heroEl.setAttribute('cy',boxCenterY);
   heroEl.classList.remove('hidden');
   heroOverride=false;
   await wait(250);
-  if(token!==runId)return boxRight+250;
+  if(token!==runId)return ffnBoxRight+250;
 
   // 카메라를 원래 배율로 되돌리는 동시에, 다음 박스(다음 토큰 예측)와 겹치지
   // 않도록 오른쪽으로 더 이동한다. 세로 기준점은 decodeZone의 후보 박스
@@ -959,7 +1008,7 @@ async function transformerZone(g,startX,data,token){
   targetVBW=VB_W0;
   targetVBH=VB_H0;
   targetY=(railY-30-115)-VB_H0*0.5;
-  const clearX=boxRight+300;
+  const clearX=ffnBoxRight+300;
   await centerOn(clearX,token);
   return clearX+250;
 }

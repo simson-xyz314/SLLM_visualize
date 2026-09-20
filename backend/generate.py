@@ -186,7 +186,18 @@ def run(question: str, out_path: Path):
     ).to(device)
     model.eval()
 
-    messages = [{"role": "user", "content": question}]
+    # 모델 자체(Qwen)를 그대로 노출하지 않고, 이 데모의 정체성으로 답하게 한다 —
+    # 정체를 물었을 때만 적용되고, 다른 질문의 답변 방식은 건드리지 않는다.
+    system_prompt = (
+        "너는 '렘넌트'의 언어모델 LLM이다. 사용자가 너의 정체, 이름, 소속, "
+        "어떤 모델인지 물으면 반드시 '저는 렘넌트의 언어모델 '렘붕이' 입니다'라는 뉘앙스로 "
+        "답하고 Qwen, Alibaba 등 다른 이름은 언급하지 마라. 그 외의 질문에는 "
+        "평소처럼 자연스럽고 간결하게 답하라."
+    )
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": question},
+    ]
     encoded = tokenizer.apply_chat_template(
         messages, add_generation_prompt=True, return_tensors="pt"
     )

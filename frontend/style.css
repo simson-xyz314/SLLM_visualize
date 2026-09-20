@@ -140,6 +140,8 @@ html, body {
    솟아오른다. */
 .txLayerAttnBar { fill:#fff; }
 .txLayerFfnBar { fill:#ffb020; }
+/* 막대마다 위에 다는 작은 실측값(0~1 정규화) 숫자 태그. */
+.txLayerBarValue { fill:rgba(255,255,255,.55); font:8px Consolas,monospace; }
 .txRail { fill:rgba(255,255,255,.72); font:34px Consolas,monospace; letter-spacing:.2em; }.txBigToken { fill:#fff; font:25px Consolas,monospace; text-anchor:middle; }.txBigId { fill:rgba(255,255,255,.65); font:16px Consolas,monospace; text-anchor:middle; }
 .txMainRail { stroke:rgba(255,255,255,.42); stroke-width:2.5; }
 .txBracket { fill:#fff; font:25px Consolas,monospace; filter:url(#txGlow); }.txArrayMid { fill:rgba(255,255,255,.7); font:25px Consolas,monospace; }
