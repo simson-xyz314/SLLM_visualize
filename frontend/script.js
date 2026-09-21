@@ -1109,6 +1109,7 @@ async function decodeZone(g,startX,data,token){
     if(token!==runId){bail();return}
     rows[winnerRow].bar.classList.add('win');
     rows[winnerRow].label.classList.add('win');
+    rows[winnerRow].lamp.classList.add('win');
     await wait(160);
     if(token!==runId){bail();return}
 
@@ -1121,6 +1122,7 @@ async function decodeZone(g,startX,data,token){
     await wait(80);
     if(token!==runId){bail();return}
     rows[winnerRow].lamp.classList.remove('on');
+    rows[winnerRow].lamp.classList.remove('win');
     rows[winnerRow].lamp.classList.add('done');
     rows[winnerRow].bar.classList.remove('win');
     rows[winnerRow].bar.classList.add('done');
@@ -1344,9 +1346,54 @@ el.suggest.querySelectorAll('button').forEach(btn=>{
 });
 // 처음으로 돌아가기: 진행 중인 애니메이션은 runId를 바꿔 각 단계의 token!==runId
 // 체크에서 스스로 멈추게 하고, 화면은 최초 입력 폼 상태로 되돌린다.
-function resetToForm(hintMsg){
+// 처음으로 돌아갈 때, 마치 카메라가 계속 위로 올라가는 것처럼 하나의 연속된
+// 움직임으로 처리한다 — 시작 화면(입력창·RUN·추천 질문)은 지금 화면(무대
+// 전체) 바로 위에 미리 대기하고 있다가, 지금 화면이 아래로 내려가는 것과
+// "같은 속도로, 같은 순간에" 함께 내려와 그 자리를 이어받는다. 따로따로 두
+// 번(내려가기 → 멈춤 → 올라오기) 움직이지 않고 한 번의 하강으로 끝난다.
+async function slideResetTransition(){
+  const vh=window.innerHeight;
+  // 실제 이동 거리를 화면 높이보다 훨씬 더 길게 잡는다 — 딱 한 화면 높이만큼만
+  // 움직이면, 두 화면의 내용이 다 화면 한가운데 쪽에 몰려 있어서(입력창·박스
+  // 다 top:50% 근처) 전환 중간에 서로 겹쳐 보인다. 여유를 넉넉히 둬서 겹치지
+  // 않게 한다.
+  const travel=vh*2;
+  const slideDownEls=[el.stage,el.stageInfo,el.reset].filter(Boolean).map(e=>({el:e,base:''}));
+  const startBtn=el.form.querySelector('button');
+  const slideUpEls=[
+    {el:el.input,base:'translate(-50%,-50%)'},
+    {el:startBtn,base:'translateX(-50%)'},
+    {el:el.hint,base:'translateX(-50%)'},
+    {el:el.suggest,base:'translateX(-50%)'}
+  ].filter(x=>x.el);
+  el.form.style.display='';
+  el.suggest.style.display='';
+  // 시작 화면을 지금 화면의 훨씬 위(화면 밖)에 미리 놓아둔다.
+  slideUpEls.forEach(({el:e,base})=>{e.style.transform=`${base} translateY(${-travel}px)`});
+  // 방금 건 시작 위치가 실제로 반영되도록 강제로 한 번 리플로우시킨 뒤에
+  // 전환을 시작한다 — 안 그러면 처음 몇 프레임이 생략돼 뚝 끊겨 보일 수 있다.
+  void el.suggest.offsetHeight;
+  await new Promise(done=>{
+    const start=performance.now(),dur=1100;
+    function step(now){
+      const q=Math.min(1,(now-start)/dur),e=1-Math.pow(1-q,3),downY=travel*e;
+      slideDownEls.forEach(({el:e2})=>{e2.style.transform=`translateY(${downY}px)`});
+      slideUpEls.forEach(({el:e2,base})=>{e2.style.transform=`${base} translateY(${downY-travel}px)`});
+      if(q<1)requestAnimationFrame(step);else done();
+    }
+    requestAnimationFrame(step);
+  });
+  slideDownEls.forEach(({el:e})=>{e.style.transform=''});
+  slideUpEls.forEach(({el:e})=>{e.style.transform=''});
+}
+async function resetToForm(hintMsg){
   ++runId;
   heroOverride=false;
+  // 슬라이드 전환(약 1.1초)이 다 끝난 뒤가 아니라, 버튼을 누르는 그 순간 바로
+  // 입력창을 비운다 — 전환 중엔 입력창이 화면 밖에 있어서 지워도 안 보이니,
+  // 미룰 이유가 없다.
+  el.input.value='';
+  await slideResetTransition();
   el.svg.replaceChildren();
   el.stage.classList.remove('running');
   el.reset.classList.remove('show');
@@ -1366,8 +1413,6 @@ function resetToForm(hintMsg){
   el.hint.textContent=hintMsg||defaultHint;
   el.decoy.classList.remove('show');
   el.decoy.textContent='';
-  el.form.style.display='';
-  el.suggest.style.display='';
   el.input.focus();
 }
 el.reset.addEventListener('click',()=>resetToForm());

@@ -148,8 +148,10 @@ html, body {
 .txCursor { fill:#fff; }.txCursorChar { fill:#000; }.txDivider { stroke:rgba(255,255,255,.35); stroke-width:1.5; }
 .txArrayLight { fill:#fff; filter:url(#txGlow); }
 .txLamp { fill:rgba(255,255,255,.18); }.txLamp.on { fill:#fff; filter:url(#txGlow); }.txCandBox { fill:#030304; stroke:rgba(255,255,255,.4); stroke-width:2; }
-.txBar.win { fill:#fff; filter:url(#txGlow); }.txCandidateText.win { fill:#fff; }
-.txBar.done { fill:rgba(255,255,255,.5); }.txLamp.done { fill:rgba(255,255,255,.5); }
+/* 선택된 토큰(당첨 후보)의 막대와 점멸등은 다른 후보들과 다른 진한
+   주황노란색으로 켜서 눈에 띄게 한다. */
+.txBar.win { fill:#f2a900; filter:url(#txGlow); }.txLamp.win { fill:#f2a900; filter:url(#txGlow); }.txCandidateText.win { fill:#fff; }
+.txBar.done { fill:rgba(242,169,0,.55); }.txLamp.done { fill:rgba(242,169,0,.55); }
 .txHero { fill:#fff; filter:url(#txGlow); animation:txHeroPulse 1.4s ease-in-out infinite; transition:opacity .22s ease; } @keyframes txHeroPulse { 0%,100% { r:7; opacity:1; } 50% { r:8.5; opacity:.75; } }
 .txHero.hidden { opacity:0 !important; animation:none; }
 
