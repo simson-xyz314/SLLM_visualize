@@ -111,6 +111,11 @@ html, body {
    문장이 있는 자리)에서 항상 조금씩 벗어난다. 그래서 input만 따로 화면
    50%/50%에 고정하고, 버튼·힌트는 거기서부터 고정된 간격만큼 아래에 각자
    따로 고정한다 — 서로의 위치에 영향을 주지 않는다. */
+/* remnant 로고 — 별 같은 점들로 이루어진 글자. 입력창 바로 위에 떠 있다가
+   입력을 시작하면 흩어져 사라진다(logo3d.js). */
+.txLogo3d { position:fixed; left:50%; top:calc(50% - 370px); transform:translateX(-50%); width:min(760px,92vw); height:300px; z-index:4; opacity:0; transition:opacity 1s ease; }
+.txLogo3d.ready { opacity:1; }
+.txLogo3d canvas { display:block; width:100%; height:100%; }
 .txForm { position:static; }.txForm label { display:none; }.txForm div { display:contents; }.txForm input { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; width:min(510px,calc(100vw - 42px)); color:#fff; background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.4); outline:0; padding:8px 0; font:15px Consolas,monospace; text-align:center; }.txForm button { position:fixed; left:50%; top:calc(50% + 32px); transform:translateX(-50%); z-index:4; color:#fff; border:1px solid rgba(255,255,255,.3); background:transparent; padding:6px 20px; cursor:pointer; font:10px Consolas,monospace; }.txForm p { position:fixed; left:50%; top:calc(50% + 70px); transform:translateX(-50%); z-index:4; width:min(510px,calc(100vw - 42px)); text-align:center; color:rgba(255,255,255,.35); font-size:10px; line-height:1.45; }.txForm p:empty { display:none; }
 /* 입력창 밑에 뜨는 추천 질문 박스 — 클릭하면 그 문장으로 바로 실행된다. */
 .txSuggest { position:fixed; left:50%; top:calc(50% + 110px); transform:translateX(-50%); z-index:4; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width:min(600px,calc(100vw - 42px)); }
@@ -158,6 +163,11 @@ html, body {
 .txReset { position:fixed; top:26px; right:28px; z-index:8; padding:6px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.22); color:rgba(255,255,255,.65); font:11px Consolas,monospace; letter-spacing:.08em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .3s ease, background .2s ease, color .2s ease; }
 .txReset.show { opacity:1; pointer-events:auto; }
 .txReset:hover { background:rgba(255,255,255,.16); color:#fff; }
+/* 화면 맨 아래에 고정된 경고 배지 — 회로(SVG) 안이 아니라 다른 플로팅 UI
+   (제목/설명, 질문, 처음으로 버튼)와 같은 문법으로 화면에 떠 있다. */
+.txWarnBadge { position:fixed; left:50%; bottom:32px; transform:translateX(-50%); z-index:7; opacity:0; pointer-events:none; transition:opacity .8s ease; background:#1a1206; border:1.5px solid #f2a900; border-radius:12px; padding:16px 30px; max-width:min(900px,86vw); text-align:center; font-family:"Galmuri11",Consolas,monospace; font-size:19px; line-height:1.5; color:rgba(255,255,255,.85); }
+.txWarnBadge.show { opacity:1; }
+.txWarnBadge .txWarnIcon { display:inline-block; margin-right:14px; color:#f2a900; font-weight:700; font-size:24px; }
 
 .modeLink {
   position: fixed; top: 26px; right: 28px; z-index: 6;

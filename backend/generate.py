@@ -11,10 +11,30 @@ from pathlib import Path
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
 MAX_NEW_TOKENS = 40
 TOP_K = 6
 ATTENDED_TOP_N = 5  # 새 토큰이 주목하는 이전 토큰 중 상위 N개만 기록
+# 0.5B급 작은 모델을 순수 그리디(top-1)로 디코딩하면 같은 단어를 반복하는
+# 루프에 잘 빠진다 — 이미 나온 토큰의 로짓을 이 배율만큼 깎아서 억제한다
+# (CTRL 논문 방식과 동일: 양수 로짓은 나누고, 음수 로짓은 곱한다).
+REPETITION_PENALTY = 1.3
+
+# 정체성 system prompt는 "질문과 상관없이 항상" 넣지 않는다 — 작은 모델은
+# 시스템 프롬프트에 있는 내용을 관련 없는 질문에도 섞어 쓰는 경향이 있어서
+# (예: "오아시스는 어디야?" 같은 질문에 "저는 렘넌트의 언어모델..." 같은 소리를
+# 답에 끼워 넣음), 실제로 정체를 묻는 질문일 때만 이 프롬프트를 끼워 넣어
+# 다른 질문에는 아예 노출되지 않게 한다.
+IDENTITY_TRIGGERS = [
+    "누구", "정체", "이름이 뭐", "너는 뭐", "너 뭐", "소속", "만들었",
+    "무슨 모델", "어떤 모델", "무슨 ai", "어떤 ai", "ai가 뭐", "ai야",
+    "qwen", "큐원", "퀀",
+]
+
+
+def _is_identity_question(question: str) -> bool:
+    q = question.lower()
+    return any(trigger in q for trigger in IDENTITY_TRIGGERS)
 
 
 def _common_prefix_len(a: str, b: str) -> int:
@@ -188,9 +208,13 @@ def run(question: str, out_path: Path):
 
     # 모델 자체(Qwen)를 그대로 노출하지 않고, 이 데모의 정체성으로 답하게 한다 —
     # 정체를 물었을 때만 적용되고, 다른 질문의 답변 방식은 건드리지 않는다.
-    # 0.5B급 작은 모델은 지시를 절반만 따르는 경우가 있어서(예: "저는 렘넌트의
+    # 작은 모델은 지시를 절반만 따르는 경우가 있어서(예: "저는 렘넌트의
     # 언어모델인 Qwen입니다"처럼 정체성 문구에 원래 이름을 덧붙여버림), 금지어를
-    # 못 박고 틀린 예시까지 보여줘서 최대한 확실하게 막는다.
+    # 못 박고 틀린 예시까지 보여줘서 최대한 확실하게 막는다. 그리고 이 프롬프트
+    # 자체를 상관없는 질문에는 아예 넣지 않는다(_is_identity_question) — 안
+    # 그러면 "오아시스는 어디야?" 같은 질문에까지 "저는 렘넌트의 언어모델..."이
+    # 섞여 들어오는 걸 봐서, 프롬프트에 "다른 질문엔 무시하라"고 적어두는 것만
+    # 으로는 작은 모델에겐 부족했다.
     system_prompt = (
         "너는 '렘넌트'가 만든 언어모델이다. 사용자가 너의 정체, 이름, 소속, 어떤 "
         "모델인지, 누가 만들었는지 물으면 다른 말 없이 정확히 이 한 문장으로만 "
@@ -198,13 +222,12 @@ def run(question: str, out_path: Path):
         "이 문장에 Qwen, 큐원, 퀀, Alibaba, 알리바바 같은 단어를 덧붙이거나 "
         "섞어 쓰지 마라. "
         "예를 들어 '저는 렘넌트의 언어모델인 Qwen입니다' 처럼 다른 이름을 "
-        "같이 말하는 것도 금지다. 정체를 묻는 게 아닌 다른 질문에는 이 규칙과 "
-        "상관없이 평소처럼 자연스럽고 간결하게 답하라."
+        "같이 말하는 것도 금지다."
     )
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": question},
-    ]
+    messages = []
+    if _is_identity_question(question):
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": question})
     encoded = tokenizer.apply_chat_template(
         messages, add_generation_prompt=True, return_tensors="pt"
     )
@@ -221,10 +244,15 @@ def run(question: str, out_path: Path):
     with torch.no_grad():
         for step in range(MAX_NEW_TOKENS):
             outputs = model(input_ids=input_ids, output_attentions=True)
-            logits = outputs.logits[0, -1, :]
+            logits = outputs.logits[0, -1, :].clone()
+            base_ids = input_ids[0].tolist()
+            for seen_id in set(base_ids):
+                if logits[seen_id] > 0:
+                    logits[seen_id] /= REPETITION_PENALTY
+                else:
+                    logits[seen_id] *= REPETITION_PENALTY
             probs = torch.softmax(logits, dim=-1)
 
-            base_ids = input_ids[0].tolist()
             topk = torch.topk(probs, k=TOP_K)
             candidates = [
                 {"token": decode_next_piece(tokenizer, base_ids, idx), "prob": round(float(p), 4), "id": idx}

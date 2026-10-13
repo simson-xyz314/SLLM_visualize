@@ -15,7 +15,8 @@ const el={
   stageTitle:document.getElementById('stageTitle'),
   stageSub:document.getElementById('stageSub'),
   decoy:document.getElementById('decoyText'),
-  suggest:document.getElementById('suggestions')
+  suggest:document.getElementById('suggestions'),
+  warnBadge:document.getElementById('warnBadge')
 };
 let runId=0;
 const defaultHint=el.hint.textContent;
@@ -1264,11 +1265,15 @@ async function finaleZone(g,answer,token){
   el.metric.textContent=`COMPLETE · ${answer.trim().length} CHARACTERS`;
 
   // 다른 UI가 다 사라지고 답변이 완전히 자리잡은 마지막 순간에야, 이 전체 과정이
-  // "raw 토큰 출력을 평문으로 바꾼 것"이었다는 설명이 뒤늦게 페이드인으로 나온다.
+  // "raw 토큰 출력을 평문으로 바꾼 것"이었다는 설명이 뒤늦게 페이드인으로 나온다
+  // — 경고 배지도 미리 나와 있지 않고 이때 같이 나온다.
   await wait(700);
   if(token!==runId)return;
   station('05 / DETOKENIZATION (평문화)','LLM 전용 포맷으로 생성된 raw 토큰 출력을 사람이 읽는 자연스러운 문장으로 변환합니다.');
-  requestAnimationFrame(()=>el.stageInfo.classList.add('show'));
+  requestAnimationFrame(()=>{
+    el.stageInfo.classList.add('show');
+    el.warnBadge.classList.add('show');
+  });
 }
 
 // 1단계(토큰화)는 실제 모델을 전혀 쓰지 않는다(글자를 코드값으로 바꾸는 것뿐) —
@@ -1311,6 +1316,10 @@ async function requestTrace(q){
   if(!r.ok)throw new Error();
   return r.json();
 }
+// remnant 로고(logo3d.js)는 입력창에 뭔가 입력되는 순간 별들이 사방으로
+// 흩어지며 사라진다 — 직접 타이핑할 때뿐 아니라 추천 질문을 눌러 값이 채워질
+// 때도(아래 suggest 클릭 핸들러) 같은 함수를 부른다.
+el.input.addEventListener('input',()=>{window.scatterRemnantLogo&&window.scatterRemnantLogo()});
 el.form.addEventListener('submit',async e=>{
   e.preventDefault();
   const q=el.input.value.trim();
@@ -1341,6 +1350,7 @@ el.form.addEventListener('submit',async e=>{
 el.suggest.querySelectorAll('button').forEach(btn=>{
   btn.addEventListener('click',()=>{
     el.input.value=btn.textContent;
+    window.scatterRemnantLogo&&window.scatterRemnantLogo();
     el.form.requestSubmit();
   });
 });
@@ -1358,7 +1368,15 @@ async function slideResetTransition(){
   // 다 top:50% 근처) 전환 중간에 서로 겹쳐 보인다. 여유를 넉넉히 둬서 겹치지
   // 않게 한다.
   const travel=vh*2;
-  const slideDownEls=[el.stage,el.stageInfo,el.reset].filter(Boolean).map(e=>({el:e,base:''}));
+  // 처음으로 버튼과 경고 배지는 슬라이드에 끼워 넣지 않는다 — 둘 다 'show'
+  // 클래스로 자기만의 opacity 트랜지션을 갖고 있어서, transform을 다시
+  // 0으로 되돌리는 순간과 'show' 제거 순간 사이에 아주 잠깐이라도 "제자리에
+  // 다시 보였다가 사라지는" 깜빡임이 생길 수 있었다 — resetToForm에서 그냥
+  // 바로 'show'를 지워서 자기 opacity 트랜지션으로만 조용히 사라지게 한다.
+  const slideDownEls=[
+    {el:el.stage,base:''},
+    {el:el.stageInfo,base:''}
+  ].filter(x=>x.el);
   const startBtn=el.form.querySelector('button');
   const slideUpEls=[
     {el:el.input,base:'translate(-50%,-50%)'},
@@ -1377,7 +1395,7 @@ async function slideResetTransition(){
     const start=performance.now(),dur=1100;
     function step(now){
       const q=Math.min(1,(now-start)/dur),e=1-Math.pow(1-q,3),downY=travel*e;
-      slideDownEls.forEach(({el:e2})=>{e2.style.transform=`translateY(${downY}px)`});
+      slideDownEls.forEach(({el:e2,base})=>{e2.style.transform=`${base} translateY(${downY}px)`});
       slideUpEls.forEach(({el:e2,base})=>{e2.style.transform=`${base} translateY(${downY-travel}px)`});
       if(q<1)requestAnimationFrame(step);else done();
     }
@@ -1393,10 +1411,16 @@ async function resetToForm(hintMsg){
   // 입력창을 비운다 — 전환 중엔 입력창이 화면 밖에 있어서 지워도 안 보이니,
   // 미룰 이유가 없다.
   el.input.value='';
+  // 처음으로 버튼·경고 배지는 슬라이드와 상관없이 바로 사라지기 시작한다(자기
+  // opacity 트랜지션으로) — 슬라이드가 끝난 뒤 지우면 그 사이에 잠깐 다시
+  // 보였다 사라지는 깜빡임이 생겼었다.
+  el.reset.classList.remove('show');
+  el.warnBadge.classList.remove('show');
   await slideResetTransition();
+  // 흩어졌던 remnant 로고 별들을 다시 모아 재구성한다.
+  window.resetRemnantLogo&&window.resetRemnantLogo();
   el.svg.replaceChildren();
   el.stage.classList.remove('running');
-  el.reset.classList.remove('show');
   el.source.textContent='';
   el.answer.innerHTML='';
   // finaleZone이 답변 스트림을 인라인 opacity로 직접 숨기는데(0으로), 여기서
